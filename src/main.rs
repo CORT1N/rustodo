@@ -5,8 +5,7 @@ mod logic;
 
 use clap::Parser;
 
-use logic::{add_task, list_tasks, mark_task_done, remove_task};
-use cli::{ Cli, Command, exec };
+use cli::{ Cli, exec };
 
 
 fn main() {
