@@ -1,9 +1,15 @@
 use std::env;
+use std::error::Error;
+use std::fs::File;
+use std::io::BufReader;
 
 use rand::distr::Alphanumeric;
 use rand::Rng;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
+const DATABASE: &str = "tasks.json";
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 struct Task {
     id: String,
     title: String,
@@ -28,6 +34,19 @@ impl Task {
     }
 }
 
+fn read_tasks() -> Result<Vec<Task>, Box<dyn Error>> {
+    let file = File::open(DATABASE)?;
+    let reader = BufReader::new(file);
+    let tasks = serde_json::from_reader(reader)?;
+    Ok(tasks)
+}
+
+fn write_tasks(tasks: &Vec<Task>) -> Result<(), Box<dyn Error>> {
+    let file = File::create(DATABASE)?;
+    serde_json::to_writer_pretty(file, tasks)?;
+    Ok(())
+}
+
 fn check_args_length(command: &str, args: &Vec<String>) {
     let usage = match command {
         "add" => "<title of your task>",
@@ -44,7 +63,10 @@ fn check_args_length(command: &str, args: &Vec<String>) {
 
 fn add_task(title: &str) {
     println!("Action: add, Arg: {}", title);
+    let mut tasks = read_tasks().unwrap_or_else(|_| Vec::new());
     let task = Task::new(title.to_string());
+    tasks.push(task.clone());
+    write_tasks(&tasks).expect("Failed to write tasks to database");
     println!("Created task: {:?}", task);
 }
 
