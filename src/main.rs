@@ -74,7 +74,7 @@ fn remove_task(id: &str) {
     println!("Action: remove, Arg: {}", id);
     let mut tasks = read_tasks().unwrap_or_else(|_| Vec::new());
     let len = tasks.len();
-    tasks.retain(|task| task.id != id);
+    tasks.retain(|task| !task.id.starts_with(id));
     if tasks.len() == len {
         println!("No task found with ID: {}", id);
     } else {
@@ -84,7 +84,21 @@ fn remove_task(id: &str) {
 }
 
 fn list_tasks() {
-    println!("Action: list");
+    let tasks = read_tasks().unwrap_or_else(|_| Vec::new());
+    if tasks.is_empty() {
+        println!("No tasks found.");
+    } else {
+        const ID_LEN: usize = 8;
+        tasks.iter().for_each(|task| {
+            let status = if task.completed { "[x]" } else { "[ ]" };
+            println!(
+                "{} {} - {}",
+                status,
+                &task.id[..ID_LEN.min(task.id.len())],
+                task.title,
+            );
+        });
+    }
 }
 
 fn mark_task_done(id: &str) {
