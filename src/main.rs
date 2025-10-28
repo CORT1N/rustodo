@@ -1,5 +1,33 @@
 use std::env;
 
+use rand::distr::Alphanumeric;
+use rand::Rng;
+
+#[derive(Debug)]
+struct Task {
+    id: String,
+    title: String,
+    completed: bool,
+}
+
+impl Task {
+    fn new(title: String) -> Self {
+        Task {
+            id: Task::generate_id(),
+            title,
+            completed: false,
+        }
+    }
+
+    fn generate_id() -> String {
+        rand::rng()
+            .sample_iter(&Alphanumeric)
+            .take(16)
+            .map(char::from)
+            .collect()
+    }
+}
+
 fn check_args_length(command: &str, args: &Vec<String>) {
     let usage = match command {
         "add" => "<title of your task>",
@@ -15,7 +43,9 @@ fn check_args_length(command: &str, args: &Vec<String>) {
 }
 
 fn add_task(title: &str) {
-    println!("Action: add, Arg: {}", title)
+    println!("Action: add, Arg: {}", title);
+    let task = Task::new(title.to_string());
+    println!("Created task: {:?}", task);
 }
 
 fn remove_task(id: &str) {
