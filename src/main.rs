@@ -90,9 +90,9 @@ fn list_tasks() {
     } else {
         const ID_LEN: usize = 8;
         tasks.iter().for_each(|task| {
-            let status = if task.completed { "[x]" } else { "[ ]" };
+            let status = if task.completed { "✅" } else { "  " };
             println!(
-                "{} {} - {}",
+                "{} {}     {}",
                 status,
                 &task.id[..ID_LEN.min(task.id.len())],
                 task.title,
@@ -102,7 +102,21 @@ fn list_tasks() {
 }
 
 fn mark_task_done(id: &str) {
-    println!("Action: done, Arg: {}", id)
+    println!("Action: done, Arg: {}", id);
+    let mut tasks = read_tasks().unwrap_or_else(|_| Vec::new());
+    let mut found = false;
+    for task in &mut tasks {
+        if task.id.starts_with(id) {
+            task.completed = true;
+            found = true;
+            println!("Marked task as done: {:?}", task);
+        }
+    }
+    if found {
+        write_tasks(&tasks).expect("Failed to write tasks to database");
+    } else {
+        println!("No task found with ID: {}", id);
+    }
 }
 
 fn main() {
