@@ -72,6 +72,15 @@ fn add_task(title: &str) {
 
 fn remove_task(id: &str) {
     println!("Action: remove, Arg: {}", id);
+    let mut tasks = read_tasks().unwrap_or_else(|_| Vec::new());
+    let len = tasks.len();
+    tasks.retain(|task| task.id != id);
+    if tasks.len() == len {
+        println!("No task found with ID: {}", id);
+    } else {
+        write_tasks(&tasks).expect("Failed to write tasks to database");
+        println!("Removed task with ID: {}", id);
+    }
 }
 
 fn list_tasks() {
