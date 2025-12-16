@@ -12,28 +12,33 @@ pub struct Cli {
 
 #[derive(Subcommand)]
 pub enum Command {
+    #[command(about = "Add a new task")]
     Add {
-        #[arg(required = true, num_args(1..))]
+        #[arg(required = true, num_args(1..), help = "Title of the task")]
         title: Vec<String>,
 
-        #[arg(long= "due")]
+        #[arg(long= "due", help = "Optional due date in YYYY-MM-DD format")]
         due: Option<String>,
     },
 
+    #[command(about = "Remove a task by its ID")]
     Remove {
-        #[arg(required = true)]
+        #[arg(required = true, help = "ID of the task to remove")]
         id: String,
     },
 
+    #[command(about = "List all tasks")]
     List,
 
+    #[command(about = "Mark a task as done by its ID")]
     Done {
-        #[arg(required = true)]
+        #[arg(required = true, help = "ID of the task to mark as done")]
         id: String,
     },
 
+    #[command(about = "Export tasks to a specified format")]
     Export {
-        #[arg(long="format", default_value = "csv")]
+        #[arg(long="format", default_value = "csv", help = "Export format: 'csv' or 'markdown'")]
         format: String,
     }
 }
