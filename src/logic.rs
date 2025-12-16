@@ -1,10 +1,10 @@
-use rand::distr::Alphanumeric;
-use rand::Rng;
-use serde::{Deserialize, Serialize};
-use crate::io::{read_tasks, write_tasks};
 use crate::errors::{Result, TodoError};
+use crate::io::{read_tasks, write_tasks};
 use chrono::prelude::*;
 use colored::Colorize;
+use rand::Rng;
+use rand::distr::Alphanumeric;
+use serde::{Deserialize, Serialize};
 use std::fmt;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -89,7 +89,11 @@ pub fn add_task(title: &str, due: Option<DateTime<Local>>) -> Result<()> {
 
 pub fn remove_task(id: &str) -> Result<()> {
     let mut tasks = read_tasks()?;
-    let removed: Vec<Task> = tasks.iter().filter(|task| task.id.starts_with(id)).cloned().collect();
+    let removed: Vec<Task> = tasks
+        .iter()
+        .filter(|task| task.id.starts_with(id))
+        .cloned()
+        .collect();
     if removed.is_empty() {
         return Err(TodoError::TaskNotFound(id.to_string()));
     }
@@ -97,7 +101,7 @@ pub fn remove_task(id: &str) -> Result<()> {
     write_tasks(&tasks)?;
     for task in removed {
         println!("{} {}", "Removed task:".green(), task);
-    };
+    }
     Ok(())
 }
 
@@ -132,7 +136,8 @@ pub fn mark_task_done(id: &str) -> Result<()> {
 pub fn parse_due_date(due_str: &str) -> Result<DateTime<Local>> {
     let naive_dt = NaiveDateTime::parse_from_str(due_str, "%Y-%m-%d %H:%M")
         .map_err(|_| TodoError::InvalidDueDate(due_str.to_string()))?;
-    let local_dt: DateTime<Local> = Local.from_local_datetime(&naive_dt)
+    let local_dt: DateTime<Local> = Local
+        .from_local_datetime(&naive_dt)
         .single()
         .ok_or_else(|| TodoError::InvalidDueDate(due_str.to_string()))?;
     Ok(local_dt)

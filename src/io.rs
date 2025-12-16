@@ -1,10 +1,10 @@
+use crate::errors::Result;
+use crate::logic::Task;
+use chrono::Local;
+use colored::Colorize;
 use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
-use crate::errors::Result;
-use crate::logic::Task;
-use colored::Colorize;
-use chrono::Local;
 
 const DATABASE: &str = "tasks.json";
 
@@ -47,7 +47,14 @@ fn export_to_markdown() -> Result<()> {
     writeln!(file, "# To-Do List\n")?;
     for task in read_tasks()? {
         let status = if task.is_completed() { "~~" } else { "" };
-        writeln!(file, "- {}{}{} (Due: {})", status, task.get_title(), status, task.get_due().map_or("-".to_string(), |d| d.to_string()))?;
+        writeln!(
+            file,
+            "- {}{}{} (Due: {})",
+            status,
+            task.get_title(),
+            status,
+            task.get_due().map_or("-".to_string(), |d| d.to_string())
+        )?;
     }
     Ok(())
 }
@@ -57,14 +64,20 @@ pub fn export_data(format: &str) -> Result<()> {
         "csv" => export_to_csv()?,
         "md" | "markdown" => export_to_markdown()?,
         _ => {
-            println!("{} {} {} {}", "Unsupported export format:".red(), format, "- Supported formats are 'csv' and 'markdown'.", "Exporting to CSV by default.".yellow());
+            println!(
+                "{} {} {} {}",
+                "Unsupported export format:".red(),
+                format,
+                "- Supported formats are 'csv' and 'markdown'.",
+                "Exporting to CSV by default.".yellow()
+            );
             export_to_csv()?;
         }
     }
     Ok(())
 }
 
-fn suffix_export() -> String{
+fn suffix_export() -> String {
     let now = Local::now();
     now.format("%Y-%m-%d_%H-%M-%S").to_string()
 }

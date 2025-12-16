@@ -1,7 +1,7 @@
-use clap::{Parser, Subcommand};
-use crate::logic::{add_task, list_tasks, mark_task_done, remove_task, parse_due_date};
-use crate::io::export_data;
 use crate::errors::Result;
+use crate::io::export_data;
+use crate::logic::{add_task, list_tasks, mark_task_done, parse_due_date, remove_task};
+use clap::{Parser, Subcommand};
 
 #[derive(Parser)]
 #[command(name = "rustodo", about = "A simple CLI to-do application")]
@@ -17,7 +17,7 @@ pub enum Command {
         #[arg(required = true, num_args(1..), help = "Title of the task")]
         title: Vec<String>,
 
-        #[arg(long= "due", help = "Optional due date in YYYY-MM-DD format")]
+        #[arg(long = "due", help = "Optional due date in YYYY-MM-DD format")]
         due: Option<String>,
     },
 
@@ -38,9 +38,13 @@ pub enum Command {
 
     #[command(about = "Export tasks to a specified format")]
     Export {
-        #[arg(long="format", default_value = "csv", help = "Export format: 'csv' or 'markdown'")]
+        #[arg(
+            long = "format",
+            default_value = "csv",
+            help = "Export format: 'csv' or 'markdown'"
+        )]
         format: String,
-    }
+    },
 }
 
 pub fn exec(command: Command) -> Result<()> {
@@ -51,7 +55,7 @@ pub fn exec(command: Command) -> Result<()> {
                 None => None,
             };
             add_task(&title.join(" "), due_dt)?
-        },
+        }
         Command::Remove { id } => remove_task(&id)?,
         Command::List => list_tasks()?,
         Command::Done { id } => mark_task_done(&id)?,
