@@ -11,6 +11,9 @@ pub enum TodoError {
 
     #[error("Task with ID {0} not found.")]
     TaskNotFound(String),
+
+    #[error("Invalid due date format: {0}. Expected format: YYYY-MM-DD HH:MM")]
+    InvalidDueDate(String),
 }
 
 pub type Result<T> = std::result::Result<T, TodoError>;

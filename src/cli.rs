@@ -1,5 +1,5 @@
 use clap::{Parser, Subcommand};
-use crate::logic::{add_task, list_tasks, mark_task_done, remove_task};
+use crate::logic::{add_task, list_tasks, mark_task_done, remove_task, parse_due_date};
 use crate::errors::Result;
 
 #[derive(Parser)]
@@ -11,26 +11,22 @@ pub struct Cli {
 
 #[derive(Subcommand)]
 pub enum Command {
-    /// Add a new task
     Add {
-        /// Title of the task
         #[arg(required = true, num_args(1..))]
         title: Vec<String>,
+
+        #[arg(long= "due")]
+        due: Option<String>,
     },
 
-    /// Remove a task by ID
     Remove {
-        /// ID of the task
         #[arg(required = true)]
         id: String,
     },
 
-    /// List all tasks
     List,
 
-    /// Mark a task as done by ID
     Done {
-        /// ID of the task
         #[arg(required = true)]
         id: String,
     },
@@ -38,7 +34,13 @@ pub enum Command {
 
 pub fn exec(command: Command) -> Result<()> {
     match command {
-        Command::Add { title } => add_task(&title.join(" "))?,
+        Command::Add { title, due } => {
+            let due_dt = match due {
+                Some(s) => Some(parse_due_date(&s)?),
+                None => None,
+            };
+            add_task(&title.join(" "), due_dt)?
+        },
         Command::Remove { id } => remove_task(&id)?,
         Command::List => list_tasks()?,
         Command::Done { id } => mark_task_done(&id)?,
