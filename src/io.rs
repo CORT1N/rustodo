@@ -65,10 +65,9 @@ pub fn export_data(format: &str) -> Result<()> {
         "md" | "markdown" => export_to_markdown()?,
         _ => {
             println!(
-                "{} {} {} {}",
+                "{} {} - Supported formats are 'csv' and 'markdown'. {}",
                 "Unsupported export format:".red(),
                 format,
-                "- Supported formats are 'csv' and 'markdown'.",
                 "Exporting to CSV by default.".yellow()
             );
             export_to_csv()?;
