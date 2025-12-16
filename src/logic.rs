@@ -77,15 +77,16 @@ pub fn add_task(title: &str, due: Option<DateTime<Local>>) -> Result<()> {
 
 pub fn remove_task(id: &str) -> Result<()> {
     let mut tasks = read_tasks()?;
-    let len = tasks.len();
-    tasks.retain(|task| !task.id.starts_with(id));
-    if tasks.len() == len {
-        Err(TodoError::TaskNotFound(id.to_string()))
-    } else {
-        write_tasks(&tasks)?;
-        println!("Removed task with ID: {}", id);
-        Ok(())
+    let removed: Vec<Task> = tasks.iter().filter(|task| task.id.starts_with(id)).cloned().collect();
+    if removed.is_empty() {
+        return Err(TodoError::TaskNotFound(id.to_string()));
     }
+    tasks.retain(|task| !task.id.starts_with(id));
+    write_tasks(&tasks)?;
+    for task in removed {
+        println!("{} {}", "Removed task:".green(), task);
+    };
+    Ok(())
 }
 
 pub fn list_tasks() -> Result<()> {
@@ -105,7 +106,7 @@ pub fn mark_task_done(id: &str) -> Result<()> {
         if task.id.starts_with(id) {
             task.completed = true;
             found = true;
-            println!("Marked task as done: {}", task);
+            println!("{} {}", "Marked task as done:".green(), task);
         }
     }
     if found {
