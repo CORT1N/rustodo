@@ -9,6 +9,9 @@ pub enum TodoError {
     #[error("Serialization/Deserialization Error: {0}")]
     SerdeJson(#[from] serde_json::Error),
 
+    #[error("CSV Error: {0}")]
+    Csv(#[from] csv::Error),
+
     #[error("Task with ID {0} not found.")]
     TaskNotFound(String),
 

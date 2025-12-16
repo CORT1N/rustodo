@@ -1,5 +1,6 @@
 use clap::{Parser, Subcommand};
 use crate::logic::{add_task, list_tasks, mark_task_done, remove_task, parse_due_date};
+use crate::io::export_data;
 use crate::errors::Result;
 
 #[derive(Parser)]
@@ -30,6 +31,11 @@ pub enum Command {
         #[arg(required = true)]
         id: String,
     },
+
+    Export {
+        #[arg(long="format", default_value = "csv")]
+        format: String,
+    }
 }
 
 pub fn exec(command: Command) -> Result<()> {
@@ -44,6 +50,7 @@ pub fn exec(command: Command) -> Result<()> {
         Command::Remove { id } => remove_task(&id)?,
         Command::List => list_tasks()?,
         Command::Done { id } => mark_task_done(&id)?,
+        Command::Export { format } => export_data(&format)?,
     }
     Ok(())
 }

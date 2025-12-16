@@ -32,6 +32,18 @@ impl Task {
             .map(char::from)
             .collect()
     }
+
+    pub fn get_title(&self) -> &str {
+        &self.title
+    }
+
+    pub fn is_completed(&self) -> bool {
+        self.completed
+    }
+
+    pub fn get_due(&self) -> Option<DateTime<Local>> {
+        self.due
+    }
 }
 
 impl fmt::Display for Task {
